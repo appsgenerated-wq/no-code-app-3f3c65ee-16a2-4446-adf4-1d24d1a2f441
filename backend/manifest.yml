@@ -1,0 +1,111 @@
+name: LunarPrimateResearch
+
+entities:
+  User:
+    authenticable: true
+    properties:
+      - name
+      - name: email
+        type: email
+      - name: role
+        type: choice
+        options:
+          values: [LeadScientist, PrimateResearcher]
+        default: PrimateResearcher
+    policies:
+      create:
+        - access: admin
+      read:
+        - access: restricted
+          allow: User
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: admin
+      signup:
+        - access: public
+
+  Project:
+    properties:
+      - name: name
+        type: string
+      - name: description
+        type: text
+      - name: status
+        type: choice
+        options:
+          values: [Planning, Active, Completed, OnHold]
+        default: Planning
+    belongsTo:
+      - name: leadScientist
+        entity: User
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: restricted
+          allow: User
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: admin
+
+  ObservationLog:
+    properties:
+      - name: title
+        type: string
+      - name: details
+        type: text
+      - name: observationDate
+        type: timestamp
+      - name: gravityReading
+        type: number
+      - name: subjectPhoto
+        type: image
+        options:
+          sizes:
+            thumbnail:
+              width: 200
+              height: 200
+            display:
+              width: 800
+              height: 600
+      - name: logType
+        type: choice
+        options:
+          values: [Behavioral, Environmental, PhysicsExperiment]
+        default: Behavioral
+    belongsTo:
+      - name: observer
+        entity: User
+      - name: project
+        entity: Project
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: restricted
+          allow: User
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: restricted
+          allow: User
+          condition: self
+
+
+# Health check endpoint for connection testing
+endpoints:
+  health:
+    path: /api/health
+    method: GET
+    policies: []
+    handler: healthCheck
